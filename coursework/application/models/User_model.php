@@ -1,16 +1,17 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 
+// Model class to handle the requests related to user
 class User_model extends CI_Model {
+
+    // Function to get details of a user
     public function getUserDetails($userId) {
-        // Fetch user details from the database based on the user ID
-        // Modify the query based on your database structure
         $query = $this->db->get_where('users', array('user_id' => $userId));
         return $query->row_array();
     }
 
+    // Function to update details of a user
     public function updateUserDetails($userId, $displayName, $title, $bio) {
-        // Update user details in the database based on the user ID
-        // Modify the query based on your database structure
         $data = array(
             'display_name' => $displayName,
             'title' => $title,

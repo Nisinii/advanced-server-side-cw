@@ -1,18 +1,20 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+// Model class to handle requests related to answers
 class Answer_model extends CI_Model {
 
     public function __construct() {
         parent::__construct();
+
+        // Load necessary helpers, libraries, and database
         $this->load->database();
         $this->load->helper('url');
         $this->load->library('session');
     }
     
-
+    // Function to add an answer
     public function add_answer($data) {
-        // Assuming you have an 'answers' table in your database
         $this->db->insert('answers', $data);
     }
 
@@ -20,7 +22,13 @@ class Answer_model extends CI_Model {
         $user_id = $this->session->userdata('user_id');
         
         // Retrieve answers for a specific question along with the vote_type for the specified user
-        $answers = $this->db->get_where('answers', ['question_id' => $question_id])->result_array();
+        $answers = $this->db->select('answers.*, 
+                                      (SELECT COUNT(*) FROM votes WHERE votes.answer_id = answers.answer_id AND votes.vote_type = "upvote") AS upvotes, 
+                                      (SELECT COUNT(*) FROM votes WHERE votes.answer_id = answers.answer_id AND votes.vote_type = "downvote") AS downvotes')
+                            ->from('answers')
+                            ->where('question_id', $question_id)
+                            ->get()
+                            ->result_array();
     
         // Decode HTML entities for the 'content' field
         foreach ($answers as &$answer) {
@@ -38,8 +46,4 @@ class Answer_model extends CI_Model {
         return $answers;
     }
     
-    
-    
-
-    // Other methods for updating/deleting answers can be added here
 }
